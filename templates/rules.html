@@ -1,0 +1,377 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>TZwaf admin</title>
+
+	<link href="/css/bootstrap.min.css" rel="stylesheet">
+	<link href="/css/datepicker3.css" rel="stylesheet">
+	<link href="/css/bootstrap-table.css" rel="stylesheet">
+	<link href="/css/styles.css" rel="stylesheet">
+
+	<!--Icons-->
+	<script src="/js/lumino.glyphs.js"></script>
+
+	<!--[if lt IE 9]>
+	<script src="/js/html5shiv.js"></script>
+	<script src="/js/respond.min.js"></script>
+	<![endif]-->
+<style>
+	#btn1{
+			float: right;
+			margin: 0 5px;
+			border-radius: 20px;
+		}
+		.table th, .table td {
+			text-align: center;
+			vertical-align: middle;
+				}
+		#myTab{
+			background-color: whitesmoke;
+		}
+		#myTab:hover{
+			pointer-event:none;
+		}
+		#btn{
+			float: right;
+			width: 6%;
+			margin: 0 0 10 10;
+			border-radius: 20px;
+		}
+		#del{
+			color: red;
+		}
+</style>
+</head>
+
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#sidebar-collapse">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+ 			<a class="navbar-brand" href="#"><img src="/css/images/nav-white.png" alt="logo" id="nav-white" style="width: 20px;height: 20px;margin: 0 2px 2px 15px;">
+				<span><b>TZwaf</b></span><b>Admin</b></a>			<ul class="user-menu">
+				<li class="dropdown pull-right">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown"><svg class="glyph stroked male-user"><use xlink:href="#stroked-male-user"></use></svg> 用户 <span class="caret"></span></a>
+					<ul class="dropdown-menu" role="menu">
+						<li><a href="/admin/logout/"><svg class="glyph stroked cancel"><use xlink:href="#stroked-cancel"></use></svg> 退出登录</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</div><!-- /.container-fluid -->
+</nav>
+
+<div id="sidebar-collapse" class="col-sm-3 col-lg-2 sidebar">
+		<div id="top" style="height: 50px;"></div>
+
+	<ul class="nav menu">
+		<li><a href="/admin/dashboard/"><svg class="glyph"><span class="glyphicon glyphicon-stats"></svg> 威胁态势</a></li>
+		<li><a href="/admin/user/"><svg class="glyph"><span class="glyphicon glyphicon-user"></svg> 用户管理</a></li>
+		<li><a href="/admin/index/"><svg class="glyph"><span class="glyphicon glyphicon-credit-card"></svg> 站点管理</a></li>
+		<li class="active"><a href="/admin/rule/"><svg class="glyph"><span class="glyphicon glyphicon-fire"></svg> WAF策略</a></li>
+		<li><a href="/admin/log/"><svg class="glyph"><span class="glyphicon glyphicon-bell"></svg> 威胁告警</a></li>
+		<li role="presentation" class="divider"></li>
+	</ul>
+
+</div><!--/.sidebar-->
+<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
+	<div class="row">
+		<ol class="breadcrumb" style="position:relative;top: 20px;">
+			<li><a href="#"><svg class="glyph stroked home"><use xlink:href="#stroked-home"></use></svg></a></li>
+			<li class="active">WAF策略</li>
+		</ol>
+	</div><!--/.row-->
+	<div class="row">
+		<div class="col-lg-12">
+			<h2 class="page-header"><b>WAF策略</b></h2>
+		</div>
+	</div><!--/.row-->
+
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="panel" style="border-radius: 25px;">
+				<div class="panel-heading">
+					<a href="/admin/rule/sync/" class="btn btn-large btn-primary " id="btn1">同步全部策略</a>
+				</div>
+				<div id="prt"></div>
+				<div class="panel-body">
+<ul  class="nav nav-pills">
+	<li class="active" id="argsli"><a href="#args" data-toggle="tab">Args规则</a></li>
+	<li id="blackipli"><a href="#blackip" data-toggle="tab">IP黑名单</a></li>
+	<li id="whiteipli"><a href="#whiteip" data-toggle="tab">IP白名单</a></li>
+	<li id="cookieli"><a href="#cookie" data-toggle="tab">COOKIES规则</a></li>
+	<li id="urlli"><a href="#url" data-toggle="tab">URL规则</a></li>
+	<li id="useragentli"><a href="#useragent" data-toggle="tab">UserAgent规则</a></li>
+	<li id="headersli"><a href="#headers" data-toggle="tab">Headers规则</a></li>
+	<li id="whiteUrlli"><a href="#whiteUrl" data-toggle="tab">URL白名单</a></li>
+	<li id="postli"><a href="#post" data-toggle="tab">Post规则</a></li>
+</ul>
+
+<div id="myTabContent" class="tab-content">
+	<div class="tab-pane fade in active" id="args">
+		<a href="/admin/rule/new/{{"args"}}" class="btn btn-primary " id="btn">新增</a>
+		<table  align="center" class="table table-hover" >	
+						<thead style="background-color: whitesmoke;">
+						<tr align="center">
+							<th style="width: 90%;">Args规则列表</th>
+							<th colspan="2">操作</th>
+						</tr>
+						</thead>
+						<tbody>
+							{{range index $.Rules "args" }}
+						<tr>
+							<td>{{.RuleItem}}</td>
+							<td><a href="/admin/rule/edit/{{.Id}}/{{"args"}}">编辑</a></td>
+							<td><a href="/admin/rule/del/{{.Id}}/{{"args"}}" id="del">删除</a></td>
+						</tr>
+						
+						{{end}}
+						</tbody>
+					</table>
+	</div>
+	
+	<div class="tab-pane fade" id="blackip">
+		<a href="/admin/rule/new/{{"blackip"}}" class="btn btn-primary btn-block" id="btn">新增</a>
+		<table  align="center" class="table table-hover ">
+						<thead style="background-color: whitesmoke;">
+						<tr align="center">
+							<th style="width: 90%;">IP黑名单列表</th>
+							<th colspan="2">操作</th>						
+						</tr>
+						</thead>
+						<tbody>
+						{{range index $.Rules "blackip" }}							
+						<tr>
+							<td>{{.RuleItem}}</td>
+							<td><a href="/admin/rule/edit/{{.Id}}/{{"IP黑名单"}}">编辑</a></td>
+							<td><a href="/admin/rule/del/{{.Id}}/{{"IP黑名单"}}" id="del">删除</a></td>
+						</tr>
+						{{end}}
+						</tbody>
+					</table>
+	</div>
+
+	<div class="tab-pane fade" id="whiteip">
+		<a href="/admin/rule/new/{{"whiteip"}}" class="btn btn-primary btn-block" id="btn">新增</a>
+		<table  align="center" class="table table-hover ">
+						<thead style="background-color: whitesmoke;">
+						<tr align="center">
+							<th style="width: 90%;">IP白名单列表</th>
+							<th colspan="2">操作</th>
+						</tr>
+						</thead>
+						<tbody>
+						{{range index $.Rules "whiteip" }}
+						<tr>
+							<td>{{.RuleItem}}</td>
+							<td><a href="/admin/rule/edit/{{.Id}}/{{"IP白名单"}}">编辑</a></td>
+							<td><a href="/admin/rule/del/{{.Id}}/{{"IP白名单"}}" id="del">删除</a></td>
+						</tr>
+						{{end}}
+						</tbody>
+					</table>
+	</div>
+
+	<div class="tab-pane fade" id="cookie">
+		<a href="/admin/rule/new/{{"cookie"}}" class="btn btn-primary btn-block" id="btn">新增</a>
+		<table  align="center" class="table table-hover ">
+						<thead style="background-color: whitesmoke;">
+						<tr align="center">
+							<th style="width: 90%;">Cookies规则列表</th>
+							<th colspan="2">操作</th>
+						</tr>
+						</thead>
+						<tbody>
+					   {{range index $.Rules "cookie" }}
+						<tr>
+							<td>{{.RuleItem}}</td>
+							<td><a href="/admin/rule/edit/{{.Id}}/{{"cookie"}}">编辑</a></td>
+							<td><a href="/admin/rule/del/{{.Id}}/{{"cookie"}}" id="del">删除</a></td>
+						</tr>
+						{{end}}
+						</tbody>
+					</table>
+	</div>
+
+	<div class="tab-pane fade" id="url">
+		<a href="/admin/rule/new/{{"url"}}" class="btn btn-primary btn-block" id="btn">新增</a>
+		<table  align="center" class="table table-hover ">
+						<thead style="background-color: whitesmoke;">
+						<tr align="center">
+							<th style="width: 90%;">URL规则列表</th>
+							<th colspan="2">操作</th>
+						</tr>
+						</thead>
+						<tbody>
+						{{range index $.Rules "url" }}
+						<tr>
+							<td>{{.RuleItem}}</td>
+							<td><a href="/admin/rule/edit/{{.Id}}/{{"URL"}}">编辑</a></td>
+							<td><a href="/admin/rule/del/{{.Id}}/{{"URL"}}" id="del">删除</a></td>
+						</tr>
+						{{end}}
+						</tbody>
+					</table>
+	</div>
+
+	<div class="tab-pane fade" id="useragent">
+		<a href="/admin/rule/new/{{"useragent"}}" class="btn btn-primary btn-block" id="btn">新增</a>
+		<table  align="center" class="table table-hover ">
+						<thead style="background-color: whitesmoke;">
+						<tr align="center">
+							<th style="width: 90%;">UserAgent规则列表</th>
+							<th colspan="2">操作</th>
+						</tr>
+						</thead>
+						<tbody>
+						{{range index $.Rules "useragent" }}
+						<tr>
+							<td>{{.RuleItem}}</td>
+							<td><a href="/admin/rule/edit/{{.Id}}/{{"UserAgent"}}">编辑</a></td>
+							<td><a href="/admin/rule/del/{{.Id}}/{{"UserAgent"}}" id="del">删除</a></td>
+						</tr>
+						{{end}}
+						</tbody>
+					</table>
+	</div>
+
+	<div class="tab-pane fade" id="headers">
+		<a href="/admin/rule/new/{{"headers"}}" class="btn btn-primary btn-block" id="btn">新增</a>
+		<table  align="center" class="table table-hover ">
+						<thead style="background-color: whitesmoke;">
+						<tr align="center">
+							<th style="width: 90%;">Headers规则列表</th>
+							<th colspan="2">操作</th>
+						</tr>
+						</thead>
+						<tbody>
+						{{range index $.Rules "headers" }}
+						<tr>
+							<td>{{.RuleItem}}</td>
+							<td><a href="/admin/rule/edit/{{.Id}}/{{"Headers"}}">编辑</a></td>
+							<td><a href="/admin/rule/del/{{.Id}}/{{"Headers"}}" id="del">删除</a></td>
+						</tr>
+						{{end}}
+						</tbody>
+					</table>
+	</div>
+
+	<div class="tab-pane fade" id="whiteUrl">
+		<a href="/admin/rule/new/{{"whiteUrl"}}" class="btn btn-primary btn-block" id="btn">新增</a>
+		<table  align="center" class="table table-hover ">
+						<thead style="background-color: whitesmoke;">
+						<tr align="center">
+							<th style="width: 90%;">URL白名单列表</th>
+							<th colspan="2">操作</th>
+						</tr>
+						</thead>
+						<tbody>
+						{{range index $.Rules "whiteUrl" }}
+						<tr>
+							<td>{{.RuleItem}}</td>
+							<td><a href="/admin/rule/edit/{{.Id}}/{{"URL白名单"}}">编辑</a></td>
+							<td><a href="/admin/rule/del/{{.Id}}/{{"URL白名单"}}" id="del">删除</a></td>
+						</tr>
+						{{end}}
+						</tbody>
+					</table>
+	</div>
+
+	<div class="tab-pane fade" id="post">
+		<a href="/admin/rule/new/{{"post"}}" class="btn btn-primary btn-block" id="btn">新增</a>
+		<table  align="center" class="table table-hover ">
+						<thead style="background-color: whitesmoke;">
+						<tr align="center">
+							<th style="width: 90%;">Post规则列表</th>
+							<th colspan="2">操作</th>
+						</tr>
+						</thead>
+						<tbody>
+						{{range index $.Rules "post" }}
+						<tr>
+							<td>{{.RuleItem}}</td>
+							<td><a href="/admin/rule/edit/{{.Id}}/{{"Post"}}">编辑</a></td>
+							<td><a href="/admin/rule/del/{{.Id}}/{{"Post"}}" id="del">删除</a></td>
+						</tr>
+						{{end}}
+						</tbody>
+					</table>
+	</div>
+	
+</div>
+<script>
+	$(function () {
+		$('#myTab li:eq(1) a').tab('show');
+	});
+</script>
+					
+				</div>
+			</div>
+		</div>
+
+</div><!--/.main-->
+
+<script src="/js/jquery-1.11.1.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/chart.min.js"></script>
+<script src="/js/chart-data.js"></script>
+<script src="/js/easypiechart.js"></script>
+<script src="/js/easypiechart-data.js"></script>
+<script src="/js/bootstrap-datepicker.js"></script>
+<script src="/js/bootstrap-table.js"></script>
+<script>
+		!function ($) {
+			$(document).on("click","ul.nav li.parent > a > span.icon", function(){
+				$(this).find('em:first').toggleClass("glyphicon-minus");
+			});
+			$(".sidebar span.icon").find('em:first').addClass("glyphicon-plus");
+		}(window.jQuery);
+
+		$(window).on('resize', function () {
+		  if ($(window).width() > 768) $('#sidebar-collapse').collapse('show')
+		})
+		$(window).on('resize', function () {
+		  if ($(window).width() <= 767) $('#sidebar-collapse').collapse('hide')
+		})
+	</script>
+</div>
+</body>
+<script>
+//	同步警告框
+	var prt = document.getElementById("prt");
+	var msg = JSON.parse({{.Flash.SuccessMsg}});
+	var pd = /faild/;
+	var pd1 = /successful/;
+	var pd2 = /hash/;
+	if(msg != null){
+
+		if(pd.test(msg.Message)){
+		prt.innerHTML ="<div class='alert alert-danger alert-dismissable' id='prt'><button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>"+ "失败！Nginx未能重新载入。" +"</div>";
+		}else if(pd1.test(msg.Message)){
+		prt.innerHTML ="<div class='alert alert-success alert-dismissable' id='prt'><button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>"+ "成功！全部后端配置已同步。" +"</div>";
+		}else if(pd2.test(msg.Message)){
+		prt.innerHTML ="<div class='alert alert-warning alert-dismissable' id='prt'><button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>"+ "无效！请检查hash参数是否正确。" +"</div>";	
+		}
+	}
+
+// 定位
+	var sbt = {{.ruleType}};
+	var argsli = document.getElementById("argsli");
+	var argsdiv = document.getElementById("args");
+	var newli = document.getElementById(sbt+"li");
+	var newdiv = document.getElementById(sbt);
+	console.log(newli);
+	if(sbt != "" && "args"){
+		argsli.classList.remove("active");
+		argsdiv.setAttribute("class","tab-pane fade");
+		newli.classList.add("active");
+		newdiv.setAttribute("class","tab-pane fade in active");
+	}
+</script>
+</html>

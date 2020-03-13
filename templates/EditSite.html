@@ -1,0 +1,174 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TZwaf admin</title>
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/datepicker3.css" rel="stylesheet">
+    <link href="/css/bootstrap-table.css" rel="stylesheet">
+    <link href="/css/styles.css" rel="stylesheet">
+
+    <!--Icons-->
+    <script src="/js/lumino.glyphs.js"></script>
+
+    <!--[if lt IE 9]>
+    <script src="/js/html5shiv.js"></script>
+    <script src="/js/respond.min.js"></script>
+    <![endif]-->
+ <style>
+    	#newstipt{
+    		width: 60%;
+    		margin: 0px auto;
+    		padding: 20px;
+    	}
+    	#nstbtn{
+    		width: 30%;
+    		margin: 0 auto;
+    		padding: 5px;
+    	}
+    	#stname:hover,textarea:hover,select:hover{
+    		border:2px solid dodgerblue;
+    	}
+ 
+    </style>
+</head>
+
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#sidebar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#"><img src="/css/images/nav-white.png" alt="logo" id="nav-white" style="width: 20px;height: 20px;margin: 0 2px 2px 15px;">
+				<span><b>TZwaf</b></span><b>Admin</b></a>
+            <ul class="user-menu">
+                <li class="dropdown pull-right">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><svg class="glyph stroked male-user"><use xlink:href="#stroked-male-user"></use></svg> 用户 <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="/admin/logout/"><svg class="glyph stroked cancel"><use xlink:href="#stroked-cancel"></use></svg>退出登录</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+    </div><!-- /.container-fluid -->
+</nav>
+
+<div id="sidebar-collapse" class="col-sm-3 col-lg-2 sidebar">
+	<div id="top" style="height: 50px;"></div>
+   
+	<ul class="nav menu">
+		<li><a href="/admin/dashboard/"><svg class="glyph"><span class="glyphicon glyphicon-stats"></svg> 威胁态势</a></li>
+		<li><a href="/admin/user/"><svg class="glyph"><span class="glyphicon glyphicon-user"></svg> 用户管理</a></li>
+		<li class="active"><a href="/admin/index/"><svg class="glyph"><span class="glyphicon glyphicon-credit-card"></svg> 站点管理</a></li>
+		<li><a href="/admin/rule/"><svg class="glyph"><span class="glyphicon glyphicon-fire"></svg> WAF策略</a></li>
+		<li><a href="/admin/log/"><svg class="glyph"><span class="glyphicon glyphicon-bell"></svg> 威胁告警</a></li>
+		<li role="presentation" class="divider"></li>
+	</ul>
+
+</div><!--/.sidebar-->
+<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
+    <div class="row">
+        <!--面包屑-->
+        <ol class="breadcrumb" style="position:relative;top: 20px;">
+            <li><a href="#"><svg class="glyph stroked home"><use xlink:href="#stroked-home"></use></svg></a></li>
+            <li><a href="/admin/index">站点管理</a></li>
+            <li class="active">编辑站点</li>
+        </ol>
+    </div><!--/.row-->
+    <div class="row">
+        <div class="col-lg-12">
+            <h2 class="page-header"><b>编辑站点</b></h2>
+        </div>
+    </div><!--/.row-->
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default"  style="border-radius: 20px;">
+            	
+                <form class="sign-up" action="/admin/site/edit/{{.site.Id}}" method="post">
+                    <input type="hidden" name="_csrf" value="{{.csrf_token}}">
+                    
+                    <div id="newstipt"><label class="col-lg-2 control-label">站点名称</label>
+                   <div class="col-lg-10"><input type="text"  name="sitename" class="form-control" value="{{.site.SiteName}}" id="stname" ></div>
+                   </div><br />
+ 					
+ 					<div id="newstipt"><label class="col-lg-2 control-label">端口</label>
+                   <div class="col-lg-10"><input type="text"  name="port" class="form-control" value="{{.site.Port}}" id="stname" ></div>
+                   </div><br />
+                   
+                    <div id="newstipt"><label class="col-lg-2 control-label">IP列表</label>
+                   <div class="col-lg-10"><textarea name="backendaddr" class="form-control" >{{range .site.BackendAddr}}{{.}}{{end}}</textarea></div> </div> 
+                   <br /><br />
+                                 
+                    <div id="newstipt"><label class="col-lg-2 control-label">SSL状态</label>
+                      <div class="col-lg-10" style="width: 200px;"><select class="form-control" name="ssl" id="sslid" >
+                      		<option selected="selected">{{.site.Ssl}}</option>
+                        </select>
+                    </div></div><br />
+                    
+                    <div id="newstipt"><label class="col-lg-2 control-label">Debug</label>
+                      <div class="col-lg-10" style="width: 200px;"><select class="form-control" name="debuglevel" >
+                      		<option selected="selected">{{.site.DebugLevel}}</option>
+                            <option>debug</option>
+                            <option>info</option>
+                            <option>notice</option>
+                            <option>warn</option>
+                            <option>error</option>
+                            <option>crit</option>
+                            <option>alert</option>
+                            <option>emerg</option>
+                        </select>
+                    </div></div><br /><br />
+                    
+                    <input type="submit" value="提交" class="btn btn-large btn-primary btn-block" id="nstbtn"><br /><br />
+                </form>
+            </div>
+        </div>
+
+    </div><!--/.main-->
+
+    <script src="/js/jquery-1.11.1.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/chart.min.js"></script>
+    <script src="/js/chart-data.js"></script>
+    <script src="/js/easypiechart.js"></script>
+    <script src="/js/easypiechart-data.js"></script>
+    <script src="/js/bootstrap-datepicker.js"></script>
+    <script src="/js/bootstrap-table.js"></script>
+    <script>
+		!function ($) {
+			$(document).on("click","ul.nav li.parent > a > span.icon", function(){
+				$(this).find('em:first').toggleClass("glyphicon-minus");
+			});
+			$(".sidebar span.icon").find('em:first').addClass("glyphicon-plus");
+		}(window.jQuery);
+
+		$(window).on('resize', function () {
+		  if ($(window).width() > 768) $('#sidebar-collapse').collapse('show')
+		})
+		$(window).on('resize', function () {
+		  if ($(window).width() <= 767) $('#sidebar-collapse').collapse('hide')
+		})
+	</script>
+</div>
+</body>
+<script>
+//	ssl状态
+	var sslst = {{.site.Ssl}};
+	var sslid = document.getElementById("sslid");
+	var pd = /on/;
+//	console.log(pd.test(sslst));
+	if(pd.test(sslst)){
+		sslid.innerHTML = "<option>"+sslst+"</option><option>off</option>";
+	}else{
+		sslid.innerHTML = "<option>"+sslst+"</option><option>on</option>";
+	}
+
+</script>		
+</html>
